@@ -1,25 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { cartAPI } from "../services/api";
 
 const CartContext = createContext(null);
-
-// Mock cart data
-const MOCK_CART_ITEMS = [
-  {
-    id: "product1",
-    name: "Hydrating Face Serum",
-    price: 29.99,
-    image: "/images/products/serum.jpg",
-    quantity: 1,
-  },
-  {
-    id: "product2",
-    name: "Volumizing Mascara",
-    price: 19.99,
-    image: "/images/products/mascara.jpg",
-    quantity: 2,
-  },
-];
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
@@ -32,123 +15,114 @@ export const CartProvider = ({ children }) => {
     }
   }, [user]);
 
-  const fetchCart = () => {
+  const fetchCart = async () => {
     try {
       setLoading(true);
-      // Simulate API call with mock data
-      setTimeout(() => {
-        setCart(MOCK_CART_ITEMS);
-        setLoading(false);
-      }, 300);
+      const response = await cartAPI.getCart();
+      if (response.success && response.cart) {
+        setCart(response.cart.items || []);
+      }
     } catch (error) {
       console.error("Error fetching cart:", error);
+      setCart([]);
+    } finally {
       setLoading(false);
     }
   };
 
-  const addToCart = (productId, quantity = 1) => {
+  const addToCart = async (productId, quantity = 1) => {
     try {
       setLoading(true);
-
-      // Simulate API call with mock data
-      setTimeout(() => {
-        const existingItem = cart.find((item) => item.id === productId);
-
-        if (existingItem) {
-          // Update quantity if item already exists
-          setCart(
-            cart.map((item) =>
-              item.id === productId
-                ? { ...item, quantity: item.quantity + quantity }
-                : item
-            )
-          );
-        } else {
-          // Add new item with mock data
-          const newItem = {
-            id: productId,
-            name: `Product ${productId}`,
-            price: Math.floor(Math.random() * 50) + 10,
-            image: "/images/products/default.jpg",
-            quantity,
-          };
-          setCart([...cart, newItem]);
-        }
-
-        setLoading(false);
-      }, 300);
-
-      return { success: true };
+      const response = await cartAPI.addToCart(productId, quantity);
+      if (response.success) {
+        // Refresh cart data
+        await fetchCart();
+        return { success: true };
+      } else {
+        return {
+          success: false,
+          error: response.error || "Failed to add item to cart",
+        };
+      }
     } catch (error) {
+      console.error("Add to cart error:", error);
       setLoading(false);
       return {
         success: false,
-        error: "Failed to add item to cart",
+        error: error.message || "Failed to add item to cart",
       };
     }
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = async (cartItemId, quantity) => {
     try {
       setLoading(true);
-
-      // Simulate API call
-      setTimeout(() => {
-        setCart(
-          cart.map((item) =>
-            item.id === productId ? { ...item, quantity } : item
-          )
-        );
-        setLoading(false);
-      }, 300);
-
-      return { success: true };
+      const response = await cartAPI.updateCartItem(cartItemId, quantity);
+      if (response.success) {
+        // Refresh cart data
+        await fetchCart();
+        return { success: true };
+      } else {
+        return {
+          success: false,
+          error: response.error || "Failed to update quantity",
+        };
+      }
     } catch (error) {
+      console.error("Update quantity error:", error);
       setLoading(false);
       return {
         success: false,
-        error: "Failed to update quantity",
+        error: error.message || "Failed to update quantity",
       };
     }
   };
 
-  const removeFromCart = (productId) => {
+  const removeFromCart = async (cartItemId) => {
     try {
       setLoading(true);
-
-      // Simulate API call
-      setTimeout(() => {
-        setCart(cart.filter((item) => item.id !== productId));
-        setLoading(false);
-      }, 300);
-
-      return { success: true };
+      const response = await cartAPI.removeFromCart(cartItemId);
+      if (response.success) {
+        // Refresh cart data
+        await fetchCart();
+        return { success: true };
+      } else {
+        return {
+          success: false,
+          error: response.error || "Failed to remove item from cart",
+        };
+      }
     } catch (error) {
+      console.error("Remove from cart error:", error);
       setLoading(false);
       return {
         success: false,
-        error: "Failed to remove item from cart",
+        error: error.message || "Failed to remove item from cart",
       };
     }
   };
 
-  const clearCart = () => {
+  const clearCart = async () => {
     try {
       setLoading(true);
-
-      // Simulate API call
-      setTimeout(() => {
+      const response = await cartAPI.clearCart();
+      if (response.success) {
         setCart([]);
-        setLoading(false);
-      }, 300);
-
-      return { success: true };
+        return { success: true };
+      } else {
+        return {
+          success: false,
+          error: response.error || "Failed to clear cart",
+        };
+      }
     } catch (error) {
-      setLoading(false);
+      console.error("Clear cart error:", error);
       return {
         success: false,
-        error: "Failed to clear cart",
+        error: error.message || "Failed to clear cart",
       };
+    } finally {
+      setLoading(false);
     }
   };
 

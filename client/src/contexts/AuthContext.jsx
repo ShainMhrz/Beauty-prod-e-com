@@ -1,14 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { authAPI } from "../services/api";
 
 const AuthContext = createContext(null);
-
-// Mock user data
-const MOCK_USER = {
-  id: "user123",
-  name: "Demo User",
-  email: "demo@example.com",
-  role: "user",
-};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -18,50 +11,69 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
-  const checkAuthStatus = () => {
+  const checkAuthStatus = async () => {
     try {
       const token = localStorage.getItem("token");
       if (token) {
-        // Simulate API response with mock data
-        setUser(MOCK_USER);
+        // Verify token with backend
+        const response = await authAPI.verify();
+        if (response.valid && response.user) {
+          setUser(response.user);
+        } else {
+          localStorage.removeItem("token");
+        }
       }
-      setLoading(false);
     } catch (error) {
+      console.error("Auth check failed:", error);
       localStorage.removeItem("token");
+    } finally {
       setLoading(false);
     }
   };
 
-  const login = (email, password) => {
-    // Simulate successful login with mock data
-    if (email && password) {
-      const token = "mock-jwt-token";
-      localStorage.setItem("token", token);
-      setUser(MOCK_USER);
-      return { success: true };
+  const login = async (email, password) => {
+    try {
+      const response = await authAPI.login(email, password);
+      if (response.success && response.token) {
+        localStorage.setItem("token", response.token);
+        setUser(response.user);
+        return { success: true };
+      } else {
+        return {
+          success: false,
+          error: response.error || "Login failed",
+        };
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      return {
+        success: false,
+        error: error.message || "Login failed",
+      };
     }
-    return {
-      success: false,
-      error: "Invalid email or password",
-    };
   };
 
-  const register = (userData) => {
-    // Simulate successful registration with mock data
-    if (userData && userData.email) {
-      const token = "mock-jwt-token";
-      localStorage.setItem("token", token);
-      setUser({
-        ...MOCK_USER,
-        name: userData.name || MOCK_USER.name,
-        email: userData.email,
-      });
-      return { success: true };
+  const register = async (userData) => {
+    try {
+      const { name, email, password } = userData;
+      const response = await authAPI.register(name, email, password);
+      if (response.success && response.token) {
+        localStorage.setItem("token", response.token);
+        setUser(response.user);
+        return { success: true };
+      } else {
+        return {
+          success: false,
+          error: response.error || "Registration failed",
+        };
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      return {
+        success: false,
+        error: error.message || "Registration failed",
+      };
     }
-    return {
-      success: false,
-      error: "Registration failed",
-    };
   };
 
   const logout = () => {

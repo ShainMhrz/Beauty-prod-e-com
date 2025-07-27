@@ -13,8 +13,8 @@ const authenticateToken = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Verify user still exists
-    const [users] = await db.execute(
-      'SELECT id, username, email, role, is_active FROM users WHERE id = ?',
+    const [users] = await db.pool.execute(
+      'SELECT id, email, role, is_active FROM users WHERE id = ?',
       [decoded.userId]
     );
 

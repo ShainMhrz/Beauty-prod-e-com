@@ -22,7 +22,7 @@ const Cart = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const calculateSubtotal = () => {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cart.reduce((total, item) => total + ((item.current_price || item.price) * item.quantity), 0);
   };
 
   const calculateTax = (subtotal) => {
@@ -41,11 +41,11 @@ const Cart = () => {
     return subtotal + tax + shipping;
   };
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = (cartItemId, newQuantity) => {
     if (newQuantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(cartItemId);
     } else {
-      updateQuantity(productId, newQuantity);
+      updateQuantity(cartItemId, newQuantity);
     }
   };
 
@@ -126,7 +126,7 @@ const Cart = () => {
                 >
                   <div className={styles.itemImage}>
                     <img 
-                      src={item.image || "/api/placeholder/80/80"} 
+                      src={item.image_url || "/api/placeholder/80/80"} 
                       alt={item.name}
                       onError={(e) => {
                         e.target.src = "/api/placeholder/80/80";
@@ -136,7 +136,7 @@ const Cart = () => {
                   
                   <div className={styles.itemDetails}>
                     <h3 className={styles.itemName}>{item.name}</h3>
-                    <p className={styles.itemPrice}>${item.price.toFixed(2)}</p>
+                    <p className={styles.itemPrice}>${item.current_price ? item.current_price.toFixed(2) : item.price.toFixed(2)}</p>
                   </div>
 
                   <div className={styles.quantityControls}>
@@ -158,7 +158,7 @@ const Cart = () => {
                   </div>
 
                   <div className={styles.itemTotal}>
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ${((item.current_price || item.price) * item.quantity).toFixed(2)}
                   </div>
 
                   <button 

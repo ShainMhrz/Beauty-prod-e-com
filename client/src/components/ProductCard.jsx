@@ -1,20 +1,43 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
+import { useCart } from "../contexts/CartContext";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import styles from "./ProductCard.module.css";
 
-const ProductCard = ({ product, onAddToCart, onToggleWishlist }) => {
+const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(product.isWishlisted || false);
+  const [isAdding, setIsAdding] = useState(false);
+  const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleLike = () => {
-    if (onToggleWishlist) {
-      onToggleWishlist(product._id);
-    }
+    setIsWishlisted(!isWishlisted);
+    // Here you could also call an API to update the wishlist
   };
 
-  const handleAddToCart = () => {
-    if (onAddToCart) {
-      onAddToCart(product._id);
+  const handleAddToCart = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      const result = await addToCart(product._id, 1);
+      if (result.success) {
+        // Show success message
+        console.log("Product added to cart successfully");
+      } else {
+        console.error("Failed to add to cart:", result.error);
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -48,13 +71,13 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist }) => {
             onClick={handleLike}
             whileTap={{ scale: 0.9 }}
             aria-label={
-              product.isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+              isWishlisted ? "Remove from wishlist" : "Add to wishlist"
             }
             title={
-              product.isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+              isWishlisted ? "Remove from wishlist" : "Add to wishlist"
             }
           >
-            {product.isWishlisted ? (
+            {isWishlisted ? (
               <FaHeart className={styles.heartIcon} />
             ) : (
               <FaRegHeart />
@@ -65,9 +88,10 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist }) => {
             onClick={handleAddToCart}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            disabled={isAdding}
           >
             <FaShoppingCart className={styles.cartIcon} />
-            Add to Cart
+            {isAdding ? "Adding..." : "Add to Cart"}
           </motion.button>
         </div>
       </motion.div>
