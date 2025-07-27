@@ -25,7 +25,7 @@ async function setupDatabase() {
     const schemaSQL = fs.readFileSync(schemaPath, 'utf8');
     
     console.log('📋 Creating database and tables...');
-    await connection.execute(schemaSQL);
+    await connection.query(schemaSQL);
     console.log('✅ Database schema created successfully');
 
     // Read and execute seeds file
@@ -33,7 +33,7 @@ async function setupDatabase() {
     const seedsSQL = fs.readFileSync(seedsPath, 'utf8');
     
     console.log('🌱 Inserting sample data...');
-    await connection.execute(seedsSQL);
+    await connection.query(seedsSQL);
     console.log('✅ Sample data inserted successfully');
 
     console.log('🎉 Database setup completed!');
