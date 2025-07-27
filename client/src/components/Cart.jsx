@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FaShoppingBag, 
-  FaTrash, 
-  FaPlus, 
-  FaMinus, 
+import {
+  FaShoppingBag,
   FaArrowLeft,
   FaCreditCard,
   FaTruck,
-  FaShieldAlt
+  FaShieldAlt,
 } from "react-icons/fa";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -22,7 +19,11 @@ const Cart = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const calculateSubtotal = () => {
-    return cart.reduce((total, item) => total + ((item.current_price || item.price) * item.quantity), 0);
+    return cart.reduce(
+      (total, item) =>
+        total + (item.current_price || item.price) * item.quantity,
+      0
+    );
   };
 
   const calculateTax = (subtotal) => {
@@ -56,7 +57,7 @@ const Cart = () => {
     }
 
     setIsCheckingOut(true);
-    
+
     // Simulate checkout process
     setTimeout(() => {
       alert("Order placed successfully! Thank you for your purchase.");
@@ -81,10 +82,7 @@ const Cart = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button 
-          className={styles.backButton}
-          onClick={handleContinueShopping}
-        >
+        <button className={styles.backButton} onClick={handleContinueShopping}>
           <FaArrowLeft />
           Continue Shopping
         </button>
@@ -95,7 +93,7 @@ const Cart = () => {
       </div>
 
       {cart.length === 0 ? (
-        <motion.div 
+        <motion.div
           className={styles.emptyCart}
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -104,7 +102,7 @@ const Cart = () => {
           <FaShoppingBag className={styles.emptyIcon} />
           <h2>Your cart is empty</h2>
           <p>Discover our amazing beauty products and start shopping!</p>
-          <button 
+          <button
             className={styles.shopButton}
             onClick={handleContinueShopping}
           >
@@ -125,67 +123,79 @@ const Cart = () => {
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
                   <div className={styles.itemImage}>
-                    <img 
-                      src={item.image_url || "/api/placeholder/80/80"} 
+                    <img
+                      src={item.image_url || "/api/placeholder/80/80"}
                       alt={item.name}
                       onError={(e) => {
                         e.target.src = "/api/placeholder/80/80";
                       }}
                     />
                   </div>
-                  
+
                   <div className={styles.itemDetails}>
                     <h3 className={styles.itemName}>{item.name}</h3>
-                    <p className={styles.itemPrice}>${item.current_price ? item.current_price.toFixed(2) : item.price.toFixed(2)}</p>
+                    <p className={styles.itemPrice}>
+                      $
+                      {typeof item.current_price === "number"
+                        ? item.current_price.toFixed(2)
+                        : (item.price || 0).toFixed(2)}
+                    </p>
                   </div>
 
                   <div className={styles.quantityControls}>
-                    <button 
+                    <button
                       className={styles.quantityButton}
-                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                      onClick={() =>
+                        handleQuantityChange(item.id, item.quantity - 1)
+                      }
                       disabled={loading}
                     >
-                      <FaMinus />
+                      -
                     </button>
                     <span className={styles.quantity}>{item.quantity}</span>
-                    <button 
+                    <button
                       className={styles.quantityButton}
-                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                      onClick={() =>
+                        handleQuantityChange(item.id, item.quantity + 1)
+                      }
                       disabled={loading}
                     >
-                      <FaPlus />
+                      +
                     </button>
                   </div>
 
                   <div className={styles.itemTotal}>
-                    ${((item.current_price || item.price) * item.quantity).toFixed(2)}
+                    $
+                    {(
+                      (item.current_price || item.price) * item.quantity
+                    ).toFixed(2)}
                   </div>
 
-                  <button 
+                  <button
                     className={styles.removeButton}
                     onClick={() => removeFromCart(item.id)}
                     disabled={loading}
                   >
-                    <FaTrash />
+                    X
                   </button>
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
 
-          <motion.div 
+          <motion.div
             className={styles.orderSummary}
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <h2 className={styles.summaryTitle}>Order Summary</h2>
-            
+
             <div className={styles.summaryRow}>
               <span>Subtotal ({cart.length} items)</span>
               <span>${calculateSubtotal().toFixed(2)}</span>
             </div>
-            
+
             <div className={styles.summaryRow}>
               <span>Shipping</span>
               <span>
@@ -196,14 +206,14 @@ const Cart = () => {
                 )}
               </span>
             </div>
-            
+
             <div className={styles.summaryRow}>
               <span>Tax</span>
               <span>${calculateTax(calculateSubtotal()).toFixed(2)}</span>
             </div>
-            
+
             <div className={styles.summaryDivider}></div>
-            
+
             <div className={styles.summaryTotal}>
               <span>Total</span>
               <span>${calculateTotal().toFixed(2)}</span>
@@ -223,8 +233,8 @@ const Cart = () => {
                 <span>All payment methods accepted</span>
               </div>
             </div>
-            
-            <motion.button 
+
+            <motion.button
               className={styles.checkoutButton}
               onClick={handleCheckout}
               disabled={isCheckingOut}
@@ -236,9 +246,14 @@ const Cart = () => {
 
             {!user && (
               <p className={styles.loginPrompt}>
-                Please <button className={styles.loginLink} onClick={() => navigate("/login")}>
+                Please{" "}
+                <button
+                  className={styles.loginLink}
+                  onClick={() => navigate("/login")}
+                >
                   sign in
-                </button> to continue with checkout
+                </button>{" "}
+                to continue with checkout
               </p>
             )}
           </motion.div>

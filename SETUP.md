@@ -35,6 +35,7 @@ npm run db:setup
 ```
 
 This will:
+
 - Create the `ownbeauty_db` database
 - Set up all required tables
 - Insert sample products and a demo user
@@ -42,6 +43,7 @@ This will:
 ### 3. Environment Configuration
 
 The `.env` file is located in the root directory and contains all necessary configuration:
+
 - Database: `ownbeauty_db`
 - User: `root`
 - Password: `sampana2006_`
@@ -53,12 +55,14 @@ The `.env` file is located in the root directory and contains all necessary conf
 ### 4. Start the Application
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd server
 npm run dev
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 cd client
 npm run dev
@@ -66,7 +70,7 @@ npm run dev
 
 ### 5. Access the Application
 
-- Frontend: http://localhost:5173
+- Frontend: http://localhost:3000
 - Backend API: http://localhost:5000/api
 
 ## Demo Login
@@ -77,6 +81,7 @@ npm run dev
 ## Features Implemented
 
 ### Frontend (React)
+
 - ✅ Modern responsive design
 - ✅ User authentication (login/register)
 - ✅ Shopping cart functionality
@@ -85,6 +90,7 @@ npm run dev
 - ✅ Protected routes
 
 ### Backend (Node.js/Express)
+
 - ✅ RESTful API
 - ✅ JWT authentication
 - ✅ MySQL database integration
@@ -96,6 +102,7 @@ npm run dev
 - ✅ Error handling
 
 ### Database (MySQL)
+
 - ✅ Users table
 - ✅ Products table
 - ✅ Cart table
@@ -106,18 +113,21 @@ npm run dev
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - User registration
 - `GET /api/auth/profile` - Get user profile
 - `GET /api/auth/verify` - Verify JWT token
 
 ### Products
+
 - `GET /api/product` - Get all products
 - `GET /api/product/:id` - Get product by ID
 - `GET /api/product/featured` - Get featured products
 - `GET /api/product/categories` - Get product categories
 
 ### Cart
+
 - `GET /api/cart` - Get user's cart
 - `POST /api/cart/add` - Add item to cart
 - `PUT /api/cart/item/:id` - Update cart item quantity
@@ -146,6 +156,7 @@ The application uses the following main tables:
 ## Technology Stack
 
 **Frontend:**
+
 - React 18
 - React Router DOM
 - Framer Motion (animations)
@@ -153,6 +164,7 @@ The application uses the following main tables:
 - React Icons
 
 **Backend:**
+
 - Node.js
 - Express.js
 - MySQL2
@@ -162,21 +174,25 @@ The application uses the following main tables:
 - Express Rate Limit
 
 **Database:**
+
 - MySQL 8.0
 
 ## Troubleshooting
 
 ### Database Connection Issues
+
 - Ensure MySQL is running
 - Check database credentials in `.env`
 - Verify database exists: `SHOW DATABASES;`
 
 ### Port Conflicts
+
 - Frontend default: 5173
 - Backend default: 5000
 - Change ports in package.json if needed
 
 ### CORS Issues
+
 - Backend is configured for frontend on localhost:5173
 - Update CORS settings in `server/server.js` if needed
 
@@ -192,6 +208,7 @@ The application uses the following main tables:
 ## Development
 
 The application is fully functional with:
+
 - Real database integration
 - Live API endpoints
 - Complete user authentication

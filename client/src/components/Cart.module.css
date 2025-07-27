@@ -24,8 +24,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .header {
@@ -205,11 +209,20 @@
   justify-content: center;
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
 }
 
 .quantityButton:hover:not(:disabled) {
   background: #667eea;
   color: #fff;
+}
+
+.quantityButton:hover:not(:disabled) svg {
+  fill: #fff;
+}
+
+.quantityButton svg {
+  fill: #64748b;
 }
 
 .quantityButton:disabled {
@@ -243,11 +256,20 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  font-size: 1.2rem;
 }
 
 .removeButton:hover:not(:disabled) {
   background: #dc2626;
   color: #fff;
+}
+
+.removeButton:hover:not(:disabled) svg {
+  fill: #fff;
+}
+
+.removeButton svg {
+  fill: #dc2626;
 }
 
 .removeButton:disabled {

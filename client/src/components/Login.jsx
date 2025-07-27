@@ -93,7 +93,9 @@ const Login = () => {
       if (result && result.success) {
         navigate("/"); // redirect on success
       } else {
-        setErrors({ submit: result?.error || "Something went wrong." });
+        const errorMessage =
+          result?.error || "An unknown error occurred. Please try again.";
+        setErrors({ submit: errorMessage });
       }
     } catch (err) {
       console.error("Auth error:", err);

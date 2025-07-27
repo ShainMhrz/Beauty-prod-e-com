@@ -1,10 +1,10 @@
+require("./config/envLoader"); // Load environment variables first
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
-require("dotenv").config();
 
 const { testConnection } = require("./config/database");
 const app = express();
