@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FaUser, FaLock, FaEye, FaEyeSlash, FaEnvelope, FaSpa } from "react-icons/fa";
+import {
+  FaUser,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaEnvelope,
+  FaSpa,
+} from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
@@ -12,7 +19,7 @@ const Login = () => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -22,16 +29,13 @@ const Login = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    // Clear error when user starts typing
+    // Clear individual error when typing
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ""
-      }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -65,29 +69,34 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setLoading(true);
+    setErrors({}); // clear old errors
 
     try {
       let result;
+
       if (isRegister) {
-        result = register({
+        result = await register({
           name: formData.name,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         });
       } else {
-        result = login(formData.email, formData.password);
+        result = await login(formData.email, formData.password);
       }
 
-      if (result.success) {
-        navigate("/");
+      console.log("Auth result:", result);
+
+      if (result && result.success) {
+        navigate("/"); // redirect on success
       } else {
-        setErrors({ submit: result.error });
+        setErrors({ submit: result?.error || "Something went wrong." });
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("Auth error:", err);
       setErrors({ submit: "An error occurred. Please try again." });
     } finally {
       setLoading(false);
@@ -101,7 +110,7 @@ const Login = () => {
         <div className={styles.shape}></div>
       </div>
 
-      <motion.div 
+      <motion.div
         className={styles.formContainer}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -113,10 +122,9 @@ const Login = () => {
             {isRegister ? "Create Account" : "Welcome Back"}
           </h1>
           <p className={styles.subtitle}>
-            {isRegister 
-              ? "Join OwnBeauty community today" 
-              : "Sign in to your account"
-            }
+            {isRegister
+              ? "Join OwnBeauty community today"
+              : "Sign in to your account"}
           </p>
         </div>
 
@@ -131,10 +139,14 @@ const Login = () => {
                   placeholder="Full Name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className={`${styles.input} ${errors.name ? styles.error : ""}`}
+                  className={`${styles.input} ${
+                    errors.name ? styles.error : ""
+                  }`}
                 />
               </div>
-              {errors.name && <span className={styles.errorText}>{errors.name}</span>}
+              {errors.name && (
+                <span className={styles.errorText}>{errors.name}</span>
+              )}
             </div>
           )}
 
@@ -147,10 +159,14 @@ const Login = () => {
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`${styles.input} ${errors.email ? styles.error : ""}`}
+                className={`${styles.input} ${
+                  errors.email ? styles.error : ""
+                }`}
               />
             </div>
-            {errors.email && <span className={styles.errorText}>{errors.email}</span>}
+            {errors.email && (
+              <span className={styles.errorText}>{errors.email}</span>
+            )}
           </div>
 
           <div className={styles.inputGroup}>
@@ -162,7 +178,9 @@ const Login = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`${styles.input} ${errors.password ? styles.error : ""}`}
+                className={`${styles.input} ${
+                  errors.password ? styles.error : ""
+                }`}
               />
               <button
                 type="button"
@@ -172,7 +190,9 @@ const Login = () => {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
-            {errors.password && <span className={styles.errorText}>{errors.password}</span>}
+            {errors.password && (
+              <span className={styles.errorText}>{errors.password}</span>
+            )}
           </div>
 
           {isRegister && (
@@ -185,17 +205,21 @@ const Login = () => {
                   placeholder="Confirm Password"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className={`${styles.input} ${errors.confirmPassword ? styles.error : ""}`}
+                  className={`${styles.input} ${
+                    errors.confirmPassword ? styles.error : ""
+                  }`}
                 />
               </div>
-              {errors.confirmPassword && <span className={styles.errorText}>{errors.confirmPassword}</span>}
+              {errors.confirmPassword && (
+                <span className={styles.errorText}>
+                  {errors.confirmPassword}
+                </span>
+              )}
             </div>
           )}
 
           {errors.submit && (
-            <div className={styles.submitError}>
-              {errors.submit}
-            </div>
+            <div className={styles.submitError}>{errors.submit}</div>
           )}
 
           <motion.button
@@ -205,7 +229,11 @@ const Login = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            {loading ? "Processing..." : (isRegister ? "Create Account" : "Sign In")}
+            {loading
+              ? "Processing..."
+              : isRegister
+              ? "Create Account"
+              : "Sign In"}
           </motion.button>
         </form>
 
@@ -221,7 +249,7 @@ const Login = () => {
                   name: "",
                   email: "",
                   password: "",
-                  confirmPassword: ""
+                  confirmPassword: "",
                 });
                 setErrors({});
               }}

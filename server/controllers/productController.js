@@ -1,46 +1,50 @@
-const db = require('../config/database');
+const db = require("../config/database");
 
 const getAllProducts = async (req, res) => {
   try {
-    const { category, search, limit = 12, page = 1 } = req.query;
+    const { category, search } = req.query;
+
+    // Safely parse limit and page or use defaults
+    const limit = parseInt(req.query.limit) || 12;
+    const page = parseInt(req.query.page) || 1;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT p.id, p.name, p.description, p.price, p.category, p.stock, 
              p.image_url, p.rating, p.rating_count, p.created_at
       FROM products p 
       WHERE 1=1
     `;
-    
+
     const params = [];
 
     if (category) {
-      query += ' AND p.category = ?';
+      query += " AND p.category = ?";
       params.push(category);
     }
 
     if (search) {
-      query += ' AND (p.name LIKE ? OR p.description LIKE ?)';
+      query += " AND (p.name LIKE ? OR p.description LIKE ?)";
       params.push(`%${search}%`, `%${search}%`);
     }
 
-    query += ' ORDER BY p.created_at DESC';
+    // Interpolate LIMIT and OFFSET directly (not as placeholders)
+    query += ` ORDER BY p.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
-    const offset = (page - 1) * limit;
-    query += ' LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
-
+    // Execute query with parameters for category and search only
     const [products] = await db.pool.execute(query, params);
-    
-    // Get total count for pagination
+
+    // Get total count for pagination (same filters)
     let countQuery = `SELECT COUNT(*) as total FROM products p WHERE 1=1`;
     const countParams = [];
 
     if (category) {
-      countQuery += ' AND p.category = ?';
+      countQuery += " AND p.category = ?";
       countParams.push(category);
     }
 
     if (search) {
-      countQuery += ' AND (p.name LIKE ? OR p.description LIKE ?)';
+      countQuery += " AND (p.name LIKE ? OR p.description LIKE ?)";
       countParams.push(`%${search}%`, `%${search}%`);
     }
 
@@ -51,15 +55,15 @@ const getAllProducts = async (req, res) => {
       success: true,
       products,
       pagination: {
-        currentPage: parseInt(page),
+        currentPage: page,
         totalPages: Math.ceil(totalProducts / limit),
         totalProducts,
-        hasMore: page * limit < totalProducts
-      }
+        hasMore: page * limit < totalProducts,
+      },
     });
   } catch (error) {
-    console.error('Get products error:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch products' });
+    console.error("Get products error:", error);
+    res.status(500).json({ success: false, error: "Failed to fetch products" });
   }
 };
 
@@ -67,26 +71,31 @@ const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [products] = await db.pool.execute(`
+    const [products] = await db.pool.execute(
+      `
       SELECT p.id, p.name, p.description, p.price, p.category, p.stock, 
              p.image_url, p.rating, p.rating_count, p.created_at
       FROM products p 
       WHERE p.id = ?
-    `, [id]);
+    `,
+      [id]
+    );
 
     if (products.length === 0) {
-      return res.status(404).json({ success: false, error: 'Product not found' });
+      return res
+        .status(404)
+        .json({ success: false, error: "Product not found" });
     }
 
     const product = products[0];
 
     res.json({
       success: true,
-      product
+      product,
     });
   } catch (error) {
-    console.error('Get product error:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch product' });
+    console.error("Get product error:", error);
+    res.status(500).json({ success: false, error: "Failed to fetch product" });
   }
 };
 
@@ -103,11 +112,13 @@ const getFeaturedProducts = async (req, res) => {
 
     res.json({
       success: true,
-      products
+      products,
     });
   } catch (error) {
-    console.error('Get featured products error:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch featured products' });
+    console.error("Get featured products error:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch featured products" });
   }
 };
 
@@ -124,11 +135,13 @@ const getSaleProducts = async (req, res) => {
 
     res.json({
       success: true,
-      products
+      products,
     });
   } catch (error) {
-    console.error('Get sale products error:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch sale products' });
+    console.error("Get sale products error:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch sale products" });
   }
 };
 
@@ -144,11 +157,13 @@ const getCategories = async (req, res) => {
 
     res.json({
       success: true,
-      categories
+      categories,
     });
   } catch (error) {
-    console.error('Get categories error:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch categories' });
+    console.error("Get categories error:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch categories" });
   }
 };
 
@@ -157,5 +172,5 @@ module.exports = {
   getProductById,
   getFeaturedProducts,
   getSaleProducts,
-  getCategories
+  getCategories,
 };
