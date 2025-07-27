@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaShoppingBag, FaUser, FaBars, FaTimes, FaSpa } from "react-icons/fa";
+import { FaShoppingBag, FaUser, FaBars, FaTimes, FaSpa, FaSignOutAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useCart } from "../contexts/CartContext";
 import styles from "./Navbar.module.css";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { cart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,14 +30,37 @@ const Navbar = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const handleCartClick = () => {
+    navigate("/cart");
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    if (user) {
+      logout();
+    } else {
+      navigate("/login");
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleLogoClick = () => {
+    navigate("/");
+    setIsMobileMenuOpen(false);
+  };
+
+  const getCartItemCount = () => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  };
+
   return (
     <>
       <nav className={`${styles.navbar} ${isScrolled ? "shadow-md" : ""}`}>
         <div className={styles["navbar-container"]}>
-          <a href="#home" className={styles.logo}>
+          <button onClick={handleLogoClick} className={styles.logo}>
             <FaSpa className={styles["logo-icon"]} />
             <span>OwnBeauty</span>
-          </a>
+          </button>
 
           <div className={styles["nav-links"]}>
             <a href="#home" className={styles["nav-link"]}>
@@ -53,13 +82,19 @@ const Navbar = () => {
 
           <div className="flex items-center gap-4">
             <div className="hidden lg:flex items-center gap-4">
-              <button className={`${styles["nav-button"]} ${styles.primary}`}>
+              <button 
+                className={`${styles["nav-button"]} ${styles.primary}`}
+                onClick={handleCartClick}
+              >
                 <FaShoppingBag className={styles["nav-icon"]} />
-                <span>Cart (0)</span>
+                <span>Cart ({getCartItemCount()})</span>
               </button>
-              <button className={`${styles["nav-button"]} ${styles.secondary}`}>
-                <FaUser className={styles["nav-icon"]} />
-                <span>Login</span>
+              <button 
+                className={`${styles["nav-button"]} ${styles.secondary}`}
+                onClick={handleLoginClick}
+              >
+                {user ? <FaSignOutAlt className={styles["nav-icon"]} /> : <FaUser className={styles["nav-icon"]} />}
+                <span>{user ? user.name : "Login"}</span>
               </button>
             </div>
             <button
@@ -121,13 +156,19 @@ const Navbar = () => {
                 Contact
               </a>
               <div className={styles["mobile-nav-buttons"]}>
-                <button className={`${styles["nav-button"]} ${styles.primary}`}>
+                <button 
+                  className={`${styles["nav-button"]} ${styles.primary}`}
+                  onClick={handleCartClick}
+                >
                   <FaShoppingBag className={styles["nav-icon"]} />
-                  <span>Cart (0)</span>
+                  <span>Cart ({getCartItemCount()})</span>
                 </button>
-                <button className={`${styles["nav-button"]} ${styles.secondary}`}>
-                  <FaUser className={styles["nav-icon"]} />
-                  <span>Login</span>
+                <button 
+                  className={`${styles["nav-button"]} ${styles.secondary}`}
+                  onClick={handleLoginClick}
+                >
+                  {user ? <FaSignOutAlt className={styles["nav-icon"]} /> : <FaUser className={styles["nav-icon"]} />}
+                  <span>{user ? user.name : "Login"}</span>
                 </button>
               </div>
             </div>
