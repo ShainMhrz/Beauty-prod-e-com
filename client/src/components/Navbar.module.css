@@ -7,7 +7,7 @@
 }
 
 .logo {
-  @apply flex items-center gap-2 text-2xl font-sans font-bold text-primary hover:text-secondary transition-colors duration-300;
+  @apply flex items-center gap-2 text-2xl font-sans font-bold text-primary hover:text-secondary transition-colors duration-300 bg-transparent border-none cursor-pointer;
 }
 
 .logo-icon {
