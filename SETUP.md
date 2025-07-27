@@ -48,7 +48,7 @@ The `.env` file is located in the root directory and contains all necessary conf
 - User: `root`
 - Password: `sampana2006_`
 - Backend Port: `5000`
-- Frontend Port: `5173`
+- Frontend Port: `3000`
 
 **Note:** There is only one `.env` file in the root directory. The server is configured to read from this location.
 
@@ -73,7 +73,7 @@ npm run dev
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:5000/api
 
-## Demo Login
+## Demo Login(for some reason might not work)
 
 **Email:** demo@example.com  
 **Password:** password123
@@ -187,7 +187,7 @@ The application uses the following main tables:
 
 ### Port Conflicts
 
-- Frontend default: 5173
+- Frontend default: 3000
 - Backend default: 5000
 - Change ports in package.json if needed
 
