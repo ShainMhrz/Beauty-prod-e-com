@@ -39,7 +39,7 @@ const getAllProducts = async (req, res) => {
     query += ' LIMIT ? OFFSET ?';
     params.push(parseInt(limit), parseInt(offset));
 
-    const [products] = await db.execute(query, params);
+    const [products] = await db.pool.execute(query, params);
     
     // Get total count for pagination
     let countQuery = `
@@ -55,7 +55,7 @@ const getAllProducts = async (req, res) => {
       countParams.push(category);
     }
 
-    const [countResult] = await db.execute(countQuery, countParams);
+    const [countResult] = await db.pool.execute(countQuery, countParams);
     const totalProducts = countResult[0].total;
 
     res.json({
@@ -77,7 +77,7 @@ const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [products] = await db.execute(`
+    const [products] = await db.pool.execute(`
       SELECT p.*, c.name as category_name,
              CASE WHEN p.sale_price IS NOT NULL THEN 'true' ELSE 'false' END as on_sale
       FROM products p 
@@ -90,13 +90,13 @@ const getProductById = async (req, res) => {
     }
 
     // Get product images
-    const [images] = await db.execute(
+    const [images] = await db.pool.execute(
       'SELECT image_url, is_primary, alt_text FROM product_images WHERE product_id = ?',
       [id]
     );
 
     // Get product reviews
-    const [reviews] = await db.execute(`
+    const [reviews] = await db.pool.execute(`
       SELECT r.*, u.username, u.first_name, u.last_name 
       FROM reviews r 
       JOIN users u ON r.user_id = u.id 
@@ -119,7 +119,7 @@ const getProductById = async (req, res) => {
 
 const getCategories = async (req, res) => {
   try {
-    const [categories] = await db.execute(
+    const [categories] = await db.pool.execute(
       'SELECT * FROM categories WHERE is_active = true ORDER BY name'
     );
 
@@ -132,7 +132,7 @@ const getCategories = async (req, res) => {
 
 const getFeaturedProducts = async (req, res) => {
   try {
-    const [products] = await db.execute(`
+    const [products] = await db.pool.execute(`
       SELECT p.*, c.name as category_name, 
              pi.image_url as primary_image,
              CASE WHEN p.sale_price IS NOT NULL THEN 'true' ELSE 'false' END as on_sale
@@ -153,7 +153,7 @@ const getFeaturedProducts = async (req, res) => {
 
 const getSaleProducts = async (req, res) => {
   try {
-    const [products] = await db.execute(`
+    const [products] = await db.pool.execute(`
       SELECT p.*, c.name as category_name, 
              pi.image_url as primary_image,
              CASE WHEN p.sale_price IS NOT NULL THEN 'true' ELSE 'false' END as on_sale
