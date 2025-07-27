@@ -41,12 +41,14 @@ This will:
 
 ### 3. Environment Configuration
 
-The `.env` file is already configured with default values:
+The `.env` file is located in the root directory and contains all necessary configuration:
 - Database: `ownbeauty_db`
 - User: `root`
 - Password: `sampana2006_`
 - Backend Port: `5000`
 - Frontend Port: `5173`
+
+**Note:** There is only one `.env` file in the root directory. The server is configured to read from this location.
 
 ### 4. Start the Application
 
